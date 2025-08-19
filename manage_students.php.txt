@@ -1,0 +1,63 @@
+<?php
+session_start();
+include 'connection.php';
+
+if (!isset($_SESSION['admin_id'])) {
+    header("Location: admin_login.php");
+    exit();
+}
+
+$students = $conn->query("SELECT * FROM students ORDER BY id DESC");
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Students</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+</head>
+<body class="w3-light-grey" style="max-width: 1000px; margin: auto; margin-top: 40px;">
+
+<div class="w3-card w3-white w3-padding">
+    <h2>👨‍🎓 Manage Students</h2>
+
+    <a href="add_student.php" class="w3-button w3-green w3-margin-bottom">➕ Add Student</a>
+
+    <?php if ($students->num_rows > 0) { ?>
+    <table class="w3-table-all w3-hoverable w3-small">
+        <thead>
+            <tr class="w3-blue">
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Fees Paid</th>
+                <th>Total Fees</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php while ($student = $students->fetch_assoc()) { ?>
+                <tr>
+                    <td><?= $student['id'] ?></td>
+                    <td><?= htmlspecialchars($student['name']) ?></td>
+                    <td><?= htmlspecialchars($student['email']) ?></td>
+                    <td>₹<?= $student['fees_paid'] ?></td>
+                    <td>₹<?= $student['total_fees'] ?></td>
+                    <td>
+                        <a href="edit_student.php?id=<?= $student['id'] ?>" class="w3-button w3-yellow w3-small">✏️ Edit</a>
+                        <a href="delete_student.php?id=<?= $student['id'] ?>" class="w3-button w3-red w3-small" onclick="return confirm('Are you sure?')">🗑️ Delete</a>
+                    </td>
+                </tr>
+            <?php } ?>
+        </tbody>
+    </table>
+    <?php } else { ?>
+        <p class="w3-text-red">No students found.</p>
+    <?php } ?>
+
+    <br>
+    <a href="admin_dashboard.php" class="w3-button w3-light-grey">← Back to Dashboard</a>
+</div>
+
+</body>
+</html>
